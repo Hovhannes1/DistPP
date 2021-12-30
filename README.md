@@ -1,0 +1,2 @@
+# DistPP
+Distributed programming project
