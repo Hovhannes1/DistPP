@@ -1,0 +1,57 @@
+{
+    "links": [
+        { "agent1" :  1,
+          "agent2" :  2,
+          "delay" : 80
+        },
+        { "agent1" :  2,
+          "agent2" :  3,
+          "delay" : 200
+        },
+        { "agent1" :  1,
+          "agent2" :  3,
+          "delay" : 300
+        },
+        { "agent1" :  3,
+        "agent2" :  4,
+        "delay" : 500
+        },
+        { "agent1" :  4,
+          "agent2" :  5,
+          "delay" : 150
+        },
+        { "agent1" :  3,
+          "agent2" :  5,
+          "delay" : 300
+        },
+        { "agent1" :  6,
+          "agent2" :  5,
+          "delay" : 300
+        },
+        { "agent1" :  6,
+          "agent2" :  1,
+          "delay" : 2000
+        }
+
+    ],
+    "agents": [
+        { "id": 1,
+           "position": "0.280,0.740"
+        },
+        { "id": 2,
+          "position": "0.850,0.80"
+        },
+        { "id": 3,
+          "position": "0.900,0.420"
+        },
+        { "id": 4,
+          "position": "0.620,0.120"
+        },
+        { "id": 5,
+          "position": "0.340,0.400"
+        },
+        { "id": 6,
+          "position": "0.250,0.200"
+        }
+    ]
+}
