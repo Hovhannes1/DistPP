@@ -29,7 +29,7 @@ public:
     void scale(float sx,float sy) { position=QPointF(position.x()*sx,position.y()*sy); }
     unsigned int getId() { return id; }
 
-    void setColor(short color) { myColor=tabColors[color%nbColors]; }
+    void setColor(short color) { myColor=tabColors[color%nbColors]; blinkMode=false;}
     void setBlink() { blinkMode=false; }
     void setBlink(short c1,short c2) {
         blinkMode=true;

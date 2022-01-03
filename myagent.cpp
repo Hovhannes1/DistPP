@@ -18,6 +18,7 @@ void MyAgent::start()
         setText("A");
         myDistance=0;
         myStage=1;
+        wasLeader=true;
         sendMessageToAllNeighbors(new MessageOf<QPair<unsigned int,unsigned int>>(DISTANCE_MSG,{1,1}),myWaitingFrom);
 
     } else {
@@ -32,6 +33,7 @@ void MyAgent::messageCallback(MessagePtr ptr, unsigned int senderId) {
         case DISTANCE_MSG : distanceMsgCallback(ptr,senderId); break;
         case BACK_MSG : backMsgCallback(ptr,senderId); break;
     case ELECTB_VALUE : electBValueMsgCallback(ptr,senderId);break;
+
     }
 
 
@@ -57,8 +59,11 @@ void MyAgent::distanceMsgCallback(MessagePtr ptr, unsigned int senderId)
         //send message to neighbhoor
         //send a copy of the message to all neighbhoor
         //add the id of this neighbhoor into my waiting list
-        sendMessageToAllNeighbors(new MessageOf<unsigned int>(DISTANCE_MSG,myDistance+1),myWaitingFrom,senderId);
-         setColor(myDistance);
+        sendMessageToAllNeighbors(new MessageOf<QPair<unsigned int,unsigned int>>(DISTANCE_MSG,{myDistance+1,myStage}),myWaitingFrom,senderId);
+         if(!wasLeader){
+             setColor(myDistance);
+         }
+
          if(myWaitingFrom.empty()){
              sendMessageTo(myParent,new MessageOf<unsigned int>(BACK_MSG,qMax(myBestValue,myDistance)));
          }
@@ -96,17 +101,35 @@ void MyAgent::backMsgCallback(MessagePtr ptr, unsigned int senderId)
 
 void MyAgent::electBValueMsgCallback(MessagePtr ptr, unsigned int senderId)
 {
-    if(myBestChild==0){
+    if(myBestChild==0 && myStage==1){
         setText("B");
         setBlink(3,10);
         //stage is what will tell me that now B is the new leader
         //QPair<int,int> will let me send my stage and distance
         //if new stage detected renislize the myDistance and something
+        myWaitingFrom.clear();
         myStage=2;
         myDistance=0;
+        myBestChild=0;
+        myParent=0;
+        myBestValue=0;
+        wasLeader=true;
         sendMessageToAllNeighbors(new MessageOf<QPair<unsigned int,unsigned int>>(DISTANCE_MSG,{1,myStage}),myWaitingFrom);
-
-    }else{
+    }else if(myBestChild==0 && myStage==2 && !wasLeader){
+        setText("C");
+        setBlink(4,10);
+        //stage is what will tell me that now B is the new leader
+        //QPair<int,int> will let me send my stage and distance
+        //if new stage detected renislize the myDistance and something
+        myWaitingFrom.clear();
+        myStage=3;
+        myDistance=0;
+        myBestChild=0;
+        myParent=0;
+        myBestValue=0;
+        wasLeader=true;
+    }
+    else{
          sendMessageTo(myBestChild,new Message(ELECTB_VALUE));
     }
 }

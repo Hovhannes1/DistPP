@@ -12,6 +12,8 @@ public:
     void distanceMsgCallback(MessagePtr ptr,unsigned int senderId);
     void  backMsgCallback(MessagePtr ptr,unsigned int senderId);
     void  electBValueMsgCallback(MessagePtr ptr,unsigned int senderId);
+    void  electCValueMsgCallback(MessagePtr ptr,unsigned int senderId);
+
 
 protected:
 //my local variable
@@ -22,6 +24,7 @@ protected:
     unsigned int myBestChild;
     unsigned int myStage;
     QPair<unsigned int,unsigned int> staDist;
+    bool wasLeader=false;
 };
 
 #endif // MYAGENT_H
