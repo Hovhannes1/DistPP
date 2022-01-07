@@ -14,7 +14,7 @@ public:
     void  electBValueMsgCallback(MessagePtr ptr,unsigned int senderId);
     void  electCValueMsgCallback(MessagePtr ptr,unsigned int senderId);
 
-
+    virtual void draw(QPainter &painter);
 protected:
 //my local variable
     unsigned int myDistance;

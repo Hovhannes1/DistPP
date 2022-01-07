@@ -20,7 +20,7 @@ public:
     void addLink(P2PLink *link) {
         p2pLinks.push_back(link);
     }
-    void draw(QPainter &painter);
+    virtual void draw(QPainter &painter);
 
     virtual void start()=0;
     virtual void messageCallback(MessagePtr ptr,unsigned int senderId)=0;
@@ -60,8 +60,8 @@ public:
 private:
     unsigned int id;
     QVector<P2PLink*> p2pLinks;
-    QPointF position;
 protected:
+    QPointF position;
     bool blinkMode=false;
     QColor myBlinkColor;
     QColor myColor;

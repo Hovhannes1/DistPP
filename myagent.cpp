@@ -35,9 +35,6 @@ void MyAgent::messageCallback(MessagePtr ptr, unsigned int senderId) {
     case ELECTB_VALUE : electBValueMsgCallback(ptr,senderId);break;
 
     }
-
-
-
 }
 
 void MyAgent::distanceMsgCallback(MessagePtr ptr, unsigned int senderId)
@@ -45,34 +42,33 @@ void MyAgent::distanceMsgCallback(MessagePtr ptr, unsigned int senderId)
     MessageOf<QPair<unsigned int, unsigned int>> *msg=(MessageOf<QPair<unsigned int, unsigned int>>*)ptr.get();
     unsigned int distMsg=msg->getData().first;
     unsigned int stage=msg->getData().second;
-    if(stage>myStage){
-        myDistance=std::numeric_limits<unsigned int>::max();
-        myParent=0;
-        myWaitingFrom.clear();
-        myBestValue=0;
-        myBestChild=0;
-        myStage=stage;
-    }
+    if (stage>myStage) { // re-init the variables used for distances
+            myParent=0;
+            myBestValue=0;
+            myBestChild=0;
+            myWaitingFrom.clear();
+            myDistance=std::numeric_limits<unsigned int>::max();
+            myStage=stage;
+            qDebug() << "Node#" << getId() << ": new Stage=" << myStage;
+        }
     if(distMsg<myDistance){
-        myDistance=distMsg;
-        myParent=senderId;
-        //send message to neighbhoor
-        //send a copy of the message to all neighbhoor
-        //add the id of this neighbhoor into my waiting list
-        sendMessageToAllNeighbors(new MessageOf<QPair<unsigned int,unsigned int>>(DISTANCE_MSG,{myDistance+1,myStage}),myWaitingFrom,senderId);
-         if(!wasLeader){
+        myDistance = distMsg;
+        myParent = senderId;
+        sendMessageToAllNeighbors(new MessageOf<QPair<unsigned int,unsigned int>>(DISTANCE_MSG,{myDistance+1,myStage}), myWaitingFrom,senderId);
+        if(!wasLeader){
              setColor(myDistance);
          }
-
-         if(myWaitingFrom.empty()){
-             sendMessageTo(myParent,new MessageOf<unsigned int>(BACK_MSG,qMax(myBestValue,myDistance)));
-         }
+        if (myWaitingFrom.empty()) {
+                  sendMessageTo(myParent,new MessageOf<unsigned int>(BACK_MSG,qMax(myBestValue,myDistance)));
+           }
     } else {
-        myWaitingFrom.removeAll(senderId); //remove the sender from my list
+        if (myDistance+1==distMsg) { //[1]
+            myWaitingFrom.removeAll(senderId);
+            if (myWaitingFrom.empty() && myParent!=0) {
+                sendMessageTo(myParent,new MessageOf<unsigned int>(BACK_MSG,qMax(myBestValue,myDistance)));
+            }
+               }
         sendMessageTo(senderId,new MessageOf<unsigned int>(BACK_MSG,qMax(myBestValue,myDistance)));
-        if(myWaitingFrom.empty()){
-            sendMessageTo(myParent, new MessageOf<unsigned int>(BACK_MSG,qMax(myBestValue,myDistance)));
-        }
     }
 }
 
@@ -115,7 +111,7 @@ void MyAgent::electBValueMsgCallback(MessagePtr ptr, unsigned int senderId)
         myBestValue=0;
         wasLeader=true;
         sendMessageToAllNeighbors(new MessageOf<QPair<unsigned int,unsigned int>>(DISTANCE_MSG,{1,myStage}),myWaitingFrom);
-    }else if(myBestChild==0 && myStage==2 && !wasLeader){
+    }else if(myBestChild==0 && myStage==2){
         setText("C");
         setBlink(4,10);
         //stage is what will tell me that now B is the new leader
@@ -132,4 +128,17 @@ void MyAgent::electBValueMsgCallback(MessagePtr ptr, unsigned int senderId)
     else{
          sendMessageTo(myBestChild,new Message(ELECTB_VALUE));
     }
+}
+
+
+void MyAgent::draw(QPainter &painter) {
+    Agent::draw(painter);
+
+    painter.save();
+    painter.translate(position);
+    QRectF rect(-80,+20,160,30);
+    QString str="(" + QString::number(myBestChild) + ")";
+    painter.setFont(QFont("times",12));
+    painter.drawText(rect,Qt::AlignVCenter|Qt::AlignCenter,str);
+    painter.restore();
 }
