@@ -18,6 +18,7 @@ void Agent::draw(QPainter &painter) {
     painter.setFont(QFont("times",14));
     painter.drawText(rect,Qt::AlignVCenter|Qt::AlignCenter,myText);
     painter.restore();
+
 }
 
 unsigned int Agent::sendMessageToAllNeighbors(Message *ptr, unsigned int exceptId) {
@@ -37,10 +38,11 @@ unsigned int Agent::sendMessageToAllNeighbors(Message *ptr,QVector<unsigned int>
     list.clear();
     for (auto &l:p2pLinks) {
         auto a = l->getConnected(this);
-        if (a->getId()!=exceptId) {
-            list.push_back(a->getId());
+        unsigned int id=a->getId();
+        if (id!=exceptId) {
+            list.push_back(id);
             n++;
-            World::getWorld()->sendMessage(l,a->getId(),ptr->clone());
+            World::getWorld()->sendMessage(l,id,ptr->clone());
         }
     }
     return n;

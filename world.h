@@ -43,6 +43,7 @@ private:
     QVector<P2PLink*> links;
     QMap<qint64,QList<Event*>> events;
     QElapsedTimer timer;
+    qint64 myTimer;
 };
 
 #endif // WORLD_H

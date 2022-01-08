@@ -29,7 +29,7 @@ public:
     void scale(float sx,float sy) { position=QPointF(position.x()*sx,position.y()*sy); }
     unsigned int getId() { return id; }
 
-    void setColor(short color) { myColor=tabColors[color%nbColors]; blinkMode=false;}
+    void setColor(short color) { myColor=tabColors[color%nbColors]; }
     void setBlink() { blinkMode=false; }
     void setBlink(short c1,short c2) {
         blinkMode=true;
@@ -59,8 +59,8 @@ public:
     }
 private:
     unsigned int id;
-    QVector<P2PLink*> p2pLinks;
 protected:
+    QVector<P2PLink*> p2pLinks;
     QPointF position;
     bool blinkMode=false;
     QColor myBlinkColor;

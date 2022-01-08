@@ -8,7 +8,7 @@ class Event {
 public:
     Event(qint64 t,Agent *p_agent):time(t),agent(p_agent) {};
     virtual void consume()=0;
-    unsigned int getTime() { return time; }
+    qint64 getTime() { return time; }
     Agent *getAgent() { return agent; }
 protected:
     qint64 time;

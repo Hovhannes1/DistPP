@@ -85,6 +85,7 @@ bool World::loadConfig(const QString &title) {
 
 void World::start() {
     timer.start();
+    myTimer=0;
     for (auto &a:agents) {
         addEvent(new StartEvent(a));
         qDebug() << "StartEvent:" << a->getId();
@@ -99,8 +100,12 @@ bool World::consume() {
     auto it=events.begin();
 // consomer tous les évènements antérieurs à timer.elapsed()
     auto current = timer.elapsed();
+    qDebug() << "current=" << current;
     while (it!=events.end() && it.key()<current) {
         for (auto &l:*it) {
+            myTimer=l->getTime();
+
+            qDebug() << "consume: " << l->getTime();
             l->consume();
         }
         it=events.erase(it);
@@ -110,7 +115,8 @@ bool World::consume() {
 
 void World::sendMessage(P2PLink *link, unsigned int destId, Message *ptr) {
     Agent* destAgent = getAgent(destId);
-    auto event = new MessageEvent(destAgent,timer.elapsed()+link->getDelay(),
+    qDebug() << "SendMessage(" << destAgent->getId() << "," << myTimer+link->getDelay() << "," << link->getConnected(destAgent)->getId() << ")";
+    auto event = new MessageEvent(destAgent,myTimer+link->getDelay(),
                                   ptr,link->getConnected(destAgent)->getId());
     addEvent(event);
 }
