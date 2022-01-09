@@ -20,10 +20,6 @@
           "agent2" :  5,
           "delay" : 150
         },
-        { "agent1" :  3,
-          "agent2" :  5,
-          "delay" : 300
-        },
         { "agent1" :  6,
           "agent2" :  5,
           "delay" : 300

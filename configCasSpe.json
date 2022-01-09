@@ -4,10 +4,6 @@
           "agent2" :  2,
           "delay" : 80
         },
-        { "agent1" :  2,
-          "agent2" :  3,
-          "delay" : 200
-        },
         { "agent1" :  1,
           "agent2" :  3,
           "delay" : 300
