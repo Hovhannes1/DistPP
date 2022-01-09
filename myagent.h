@@ -10,16 +10,19 @@ public:
     void distanceMsgCallback(MessagePtr ptr,unsigned int senderId);
     void backMsgCallback(MessagePtr ptr,unsigned int senderId);
     void electBMsgCallback(MessagePtr ptr,unsigned int senderId);
+    void findX(MessagePtr ptr,unsigned int senderId);
     virtual void draw(QPainter &painter);
 protected:
     // my local variable
     unsigned int myDistance;
     QVector<unsigned int> myWaitingFrom;
+    unsigned int myPredecessor;
     unsigned int myParent;
     unsigned int myBestValue;
     unsigned int myBestChild;
     unsigned int myStage;
     bool wasLeader=false;
+    unsigned int middle;
 };
 
 #endif // MYAGENT_H

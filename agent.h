@@ -57,6 +57,9 @@ public:
     inline void setText(const QString &str) {
         myText=str;
     }
+    inline QString getText() {
+        return myText;
+    }
 private:
     unsigned int id;
 protected:

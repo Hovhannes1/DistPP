@@ -1,6 +1,6 @@
 #include "myagent.h"
 
-enum MyMsgType{DISTANCE_MSG=1, BACK_MSG, ELECTB_MSG};
+enum MyMsgType{DISTANCE_MSG=1, BACK_MSG, ELECTB_MSG, FIND_X};
 
 MyAgent::MyAgent(unsigned int p_id,const QPointF &p_position):Agent(p_id,p_position) {
     myDistance=0;
@@ -53,9 +53,10 @@ void MyAgent::start() {
 
 void MyAgent::messageCallback(MessagePtr ptr, unsigned int senderId) {
     switch(ptr->getId()) {
-        case DISTANCE_MSG : distanceMsgCallback(ptr,senderId); break;
-        case BACK_MSG : backMsgCallback(ptr,senderId); break;
-        case ELECTB_MSG : electBMsgCallback(ptr,senderId); break;
+    case DISTANCE_MSG : distanceMsgCallback(ptr,senderId); break;
+    case BACK_MSG : backMsgCallback(ptr,senderId); break;
+    case ELECTB_MSG : electBMsgCallback(ptr,senderId); break;
+    case FIND_X : findX(ptr, senderId); break;
     }
 }
 
@@ -78,7 +79,7 @@ void MyAgent::distanceMsgCallback(MessagePtr ptr, unsigned int senderId) {
         myParent = senderId;
         sendMessageToAllNeighbors(
                     new MessageOf<QPair<unsigned int,unsigned int>>(DISTANCE_MSG,{myDistance+1,myStage}),
-                                  myWaitingFrom,senderId);
+                    myWaitingFrom,senderId);
         if(!wasLeader){
             setColor(myDistance);
         }
@@ -117,7 +118,7 @@ void MyAgent::backMsgCallback(MessagePtr ptr, unsigned int senderId) {
                 sendMessageTo(myParent,new MessageOf<unsigned int>(BACK_MSG,qMax(myBestValue,myDistance)));
             } else {
                 // I'm the leader
-                setBlink(0,10);
+                if (getText() != "B") setBlink(0,10);
                 //setColor(0);
                 if (myBestChild!=0) sendMessageTo(myBestChild,new Message(ELECTB_MSG));
             }
@@ -127,32 +128,45 @@ void MyAgent::backMsgCallback(MessagePtr ptr, unsigned int senderId) {
 
 void MyAgent::electBMsgCallback(MessagePtr ptr, unsigned int senderId) {
     if(myBestChild==0 && myStage==1){
-          setText("B");
-          setBlink(3,10);
-          //stage is what will tell me that now B is the new leader
-          //QPair<int,int> will let me send my stage and distance
-          //if new stage detected renislize the myDistance and something
-          myWaitingFrom.clear();
-          myStage=2;
-          myDistance=0;
-          myBestChild=0;
-          myParent=0;
-          myBestValue=0;
-          wasLeader=true;
-          sendMessageToAllNeighbors(new MessageOf<QPair<unsigned int,unsigned int>>(DISTANCE_MSG,{1,myStage}),myWaitingFrom);
-      }else if(myBestChild==0 && myStage==2){
-          setText("C");
-          setBlink(4,10);
-          myWaitingFrom.clear();
-          myStage=3;
-          myDistance=0;
-          myBestChild=0;
-          myParent=0;
-          myBestValue=0;
-          wasLeader=true;
-      }
-      else{
-           sendMessageTo(myBestChild,new Message(ELECTB_MSG));
-      }
+        setText("B");
+        setBlink(3,10);
+        //stage is what will tell me that now B is the new leader
+        //QPair<int,int> will let me send my stage and distance
+        //if new stage detected renislize the myDistance and something
+        myWaitingFrom.clear();
+        myStage=2;
+        myPredecessor = 0;
+        myDistance=0;
+        myBestChild=0;
+        myParent=0;
+        myBestValue=0;
+        wasLeader=true;
+        sendMessageToAllNeighbors(new MessageOf<QPair<unsigned int,unsigned int>>(DISTANCE_MSG,{1,myStage}),myWaitingFrom);
 
+    }else if(myBestChild==0 && myStage==2){
+        setText("C");
+        setBlink(4,10);
+        myWaitingFrom.clear();
+        myStage=3;
+        wasLeader=true;
+        middle=(int)myDistance/2;
+        sendMessageTo(myParent,new MessageOf<unsigned int>(FIND_X,middle));
+
+    }
+    else {
+        sendMessageTo(myBestChild,new Message(ELECTB_MSG));
+    }
+
+}
+
+void MyAgent::findX(MessagePtr ptr, unsigned int senderId)
+{
+    MessageOf<int>*msg = (MessageOf<int>*)ptr.get();
+    unsigned int middle = msg->getData();
+    if(middle != myDistance){
+        sendMessageTo(myParent,new MessageOf<unsigned int>(FIND_X,middle));
+    }else{
+        setText("X");
+        setBlink(9,10);
+    }
 }
